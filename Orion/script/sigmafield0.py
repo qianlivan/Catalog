@@ -64,24 +64,29 @@ for i in range(nx):
        tempc=np.arcsin(temprho)
        dec=np.arcsin(np.cos(tempc)*np.sin(crvaly*np.pi/180.0)+ytemp*np.pi/180.0*np.sin(tempc)*np.cos(crvaly*np.pi/180.0)/temprho)
        ra=crvalx*np.pi/180.0+np.arctan((xtemp*np.pi/180.0*np.sin(tempc))/(temprho*np.cos(crvaly*np.pi/180.0)*np.cos(tempc)-ytemp*np.pi/180.0*np.sin(crvaly*np.pi/180.0)*np.sin(tempc)))
-       star = ephem.FixedBody()
-       star._ra=ra
-       star._dec=dec
-       star._epoch=ephem.J2000
-       star.compute(epoch=ephem.B1950)
+       #star = ephem.FixedBody()
+       #star._ra=ra
+       #star._dec=dec
+       #star._epoch=ephem.J2000
+       #star.compute(epoch=ephem.B1950)
        #star._epoch=ephem.B1950
        #star.compute(epoch=ephem.J2000)
-       ra1=float(star.ra)
-       dec1=float(star.dec)
-       #ra1=ra
-       #dec1=dec
+       #ra1=float(star.ra)
+       #dec1=float(star.dec)
+       new=ephem.Equatorial(ra,dec,epoch=ephem.J2000)
+       old=ephem.Equatorial(new,epoch=ephem.B1950)
+       ra1=float(old.ra)
+       dec1=float(old.dec)
+       print ra1,dec1
        xtemp1=np.cos(dec1)*np.sin(ra1-crvalx1*np.pi/180.0)
        ytemp1=np.cos(crvaly1*np.pi/180.0)*np.sin(dec1)-np.sin(crvaly1*np.pi/180.0)*np.cos(dec1)*np.cos(ra1-crvalx1*np.pi/180.0)
        xtemp1=xtemp1/np.pi*180.0+crvalx1
        ytemp1=ytemp1/np.pi*180.0+crvaly1
        itemp=int((xtemp1-crvalx1)/cdeltax1+crpixx1)
        jtemp=int((ytemp1-crvaly1)/cdeltay1+crpixy1)
-       print crvalx,crvaly,crvalx1,crvaly1,ra,dec,ra1,dec1
+       #print ra,dec,ra1,dec1
+       #print ra/np.pi*180/15,dec/np.pi*180,ra1/np.pi*180/15,dec1/np.pi*180
+       print ra/np.pi*180,dec/np.pi*180,ra1/np.pi*180,dec1/np.pi*180
        print itemp,jtemp
 
 ax = plt.subplot(111)
