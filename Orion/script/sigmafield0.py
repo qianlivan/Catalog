@@ -44,8 +44,11 @@ crvalz1 = hdulist1[0].header['crval3']
 cdeltaz1 = hdulist1[0].header['cdelt3'] 
 crpixz1 = hdulist1[0].header['crpix3'] 
 
-x1 = np.arange(-crpixx1*cdeltax1+crvalx1,(nx1-1-crpixx1)*cdeltax1+crvalx1,cdeltax1)
-y1 = np.arange(-crpixy1*cdeltay1+crvaly1,(ny1-1-crpixy1)*cdeltay1+crvaly1,cdeltay1)
+x1 = np.arange(-crpixx1*cdeltax1+crvalx1,(nx1-crpixx1)*cdeltax1+crvalx1,cdeltax1)
+y1 = np.arange(-crpixy1*cdeltay1+crvaly1,(ny1-crpixy1)*cdeltay1+crvaly1,cdeltay1)
+
+image1[np.isnan(image1)]=0.0
+print size(image1[0,0,0,:]),size(image1[0,0,:,0]),size(image1[0,:,0,0]),size(image1[:,0,0,0])
 
 
 #print x
@@ -54,6 +57,8 @@ y1 = np.arange(-crpixy1*cdeltay1+crvaly1,(ny1-1-crpixy1)*cdeltay1+crvaly1,cdelta
 #print y1
 
 vfield=np.load('sigma0.npy')
+print size(vfield[0,:]),size(vfield[:,0])
+
 
 for i in range(nx):
    for j in range(ny):
@@ -77,7 +82,7 @@ for i in range(nx):
        old=ephem.Equatorial(new,epoch=ephem.B1950)
        ra1=float(old.ra)
        dec1=float(old.dec)
-       print ra1,dec1
+       #print ra1,dec1
        xtemp1=np.cos(dec1)*np.sin(ra1-crvalx1*np.pi/180.0)
        ytemp1=np.cos(crvaly1*np.pi/180.0)*np.sin(dec1)-np.sin(crvaly1*np.pi/180.0)*np.cos(dec1)*np.cos(ra1-crvalx1*np.pi/180.0)
        xtemp1=xtemp1/np.pi*180.0+crvalx1
@@ -86,8 +91,14 @@ for i in range(nx):
        jtemp=int((ytemp1-crvaly1)/cdeltay1+crpixy1)
        #print ra,dec,ra1,dec1
        #print ra/np.pi*180/15,dec/np.pi*180,ra1/np.pi*180/15,dec1/np.pi*180
-       print ra/np.pi*180,dec/np.pi*180,ra1/np.pi*180,dec1/np.pi*180
-       print itemp,jtemp
+       #print ra/np.pi*180,dec/np.pi*180,ra1/np.pi*180,dec1/np.pi*180
+       if (itemp >=0 and itemp <nx1 and jtemp >=0 and jtemp <ny1 ):
+          #print itemp,jtemp,x1[itemp],y1[jtemp]
+          if(image1[0,0,jtemp,itemp]>0.0):
+             vfield[j,i]=vfield[j,i]-np.sqrt(image1[0,0,jtemp,itemp]*1.38e-16/1.67e-24/17.0)/1e5
+             print i,j,itemp,jtemp,np.sqrt(image1[0,0,jtemp,itemp]*1.38e-16/1.67e-24/17.0)/1e5
+          else:
+             vfield[j,i]=0.0
 
 ax = plt.subplot(111)
 im = plt.imshow(vfield, cmap=cm.spectral
